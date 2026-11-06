@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>noka.pl – blockskjutare</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root {
+--bg:#eef7e6;
+--fg:#1c2a14;
+--card:#ffffff;
+--line:#1c2a14;
+--green:#3fae3a;
+--dirt:#7a5232;
+--sky:#8fd3ff;
+--accent:#ffcf33;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:monospace;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:980px;margin:auto;padding:0 18px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0;gap:12px;flex-wrap:wrap}
+nav b{font-size:22px}
+nav a{margin-left:16px;text-decoration:none;font-weight:bold}
+.hero{background:var(--sky);border:4px solid var(--line);margin-top:6px;position:relative;overflow:hidden;text-align:center;padding:48px 18px 90px}
+.hero h1{font-size:clamp(40px,10vw,84px);margin:0;color:white;text-shadow:4px 4px 0 var(--line)}
+.hero p{font-size:clamp(16px,3.5vw,21px);max-width:560px;margin:12px auto 26px;font-weight:bold}
+.btn{display:inline-block;background:var(--accent);color:#1c2a14;font-weight:bold;font-size:22px;padding:14px 30px;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line);text-decoration:none}
+.btn:hover{transform:translate(2px,2px)}
+.ground{position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(90deg,var(--green) 0 40px,#379a33 40px 80px);border-top:4px solid var(--line)}
+.ground::after{content:"";position:absolute;left:0;right:0;top:16px;bottom:0;background:repeating-linear-gradient(90deg,var(--dirt) 0 40px,#6a4528 40px 80px)}
+.guy{position:absolute;bottom:42px;width:30px;height:62px}
+.guy i{position:absolute;display:block;border:2px solid var(--line)}
+.guy .h{left:5px;top:0;width:20px;height:20px;background:#f0c090}
+.guy .b{left:3px;top:20px;width:24px;height:24px}
+.guy .l{left:3px;top:44px;width:24px;height:18px;background:#2b3a67}
+.g1{left:10%}.g1 .b{background:#3b78d8}
+.g2{right:12%;transform:scale(1.6);transform-origin:bottom}.g2 .b{background:#c01818}
+.g3{left:26%}.g3 .b{background:#f2c21b}
+h2{font-size:30px;margin:54px 0 16px;text-shadow:3px 3px 0 var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{background:var(--card);border:4px solid var(--line);padding:14px 16px;box-shadow:5px 5px 0 var(--line)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card p{margin:0}
+.tier{display:inline-block;font-size:13px;font-weight:bold;padding:1px 8px;border:2px solid var(--line);color:#111}
+.t1{background:#ff8a8a}.t2{background:#ddd}.t3{background:#8af58a}.t4{background:#e19bff}
+table{width:100%;border-collapse:collapse;background:var(--card);border:4px solid var(--line)}
+th,td{padding:8px 12px;text-align:left;border-bottom:2px solid var(--line)}
+th{background:var(--accent);color:#1c2a14}
+.scroll{overflow-x:auto}
+.cta{text-align:center;margin:60px 0 30px;padding:34px 18px;background:var(--green);border:4px solid var(--line);color:white}
+.cta h2{margin-top:0;text-shadow:3px 3px 0 var(--line)}
+footer{text-align:center;padding:24px 0 36px;opacity:.75;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+<b>🟩 noka.pl</b>
+<div>
+<a href="#spel">Spelet</a>
+<a href="#gubbar">Gubbar</a>
+<a href="#styrning">Styrning</a>
+</div>
+</nav>
+
+<header class="hero">
+<h1>noka.pl</h1>
+<p>Blockig skjutarkamp i första person. Ett liv. Alla mot alla. Bara en kan vinna.</p>
+<a class="btn" href="spel.html">▶ SPELA NU</a>
+<div class="guy g3"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+<div class="guy g1"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+<div class="guy g2"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+<div class="ground"></div>
+</header>
+
+<h2 id="spel">Vad är det här?</h2>
+<div class="grid">
+<div class="card"><h3>🧱 Allt är kvadrat</h3><p>En värld av block, som i Minecraft. Hoppa över kullar och göm dig bakom block.</p></div>
+<div class="card"><h3>💀 Ett liv</h3><p>Dör du är det game over. Skjut först, skjut rätt.</p></div>
+<div class="card"><h3>🔫 Glock och sniper</h3><p>Snabb Glock i ena handen, kraftfull sniper med zoom i den andra.</p></div>
+<div class="card"><h3>👹 Bossar</h3><p>En jättestor boss med horn och 350 liv väntar på dig i sololäget.</p></div>
+<div class="card"><h3>🌐 Online med kod</h3><p>Skapa ett rum, skicka koden och spela mot riktiga människor. Max 10 per rum.</p></div>
+<div class="card"><h3>🏆 Troféer och statistik</h3><p>Vinn troféer, lås upp nya gubbar och följ din statistik.</p></div>
+</div>
+
+<h2 id="gubbar">Gubbarna – 67</h2>
+<div class="grid">
+<div class="card"><h3>67</h3><span class="tier t1">Dålig</span><p>60 liv · långsam · svag skada.<br>Från start.</p></div>
+<div class="card"><h3>67</h3><span class="tier t2">Medel</span><p>100 liv · helt okej på allt.<br>Från start.</p></div>
+<div class="card"><h3>67</h3><span class="tier t3">Bra</span><p>85 liv · supersnabb.<br>30 troféer.</p></div>
+<div class="card"><h3>67</h3><span class="tier t3">Bra</span><p>180 liv · stor och tålig.<br>60 troféer.</p></div>
+<div class="card"><h3>67</h3><span class="tier t4">Episk</span><p>130 liv · snabb · 130 % skada.<br>120 troféer.</p></div>
+</div>
+
+<h2 id="styrning">Styrning</h2>
+<div class="scroll">
+<table>
+<tr><th>Tangent</th><th>Gör</th></tr>
+<tr><td>W A S D</td><td>Gå</td></tr>
+<tr><td>Mellanslag</td><td>Hoppa</td></tr>
+<tr><td>Musen</td><td>Titta</td></tr>
+<tr><td>G eller vänster musknapp</td><td>Skjut med Glock</td></tr>
+<tr><td>Håll O eller höger musknapp</td><td>Zooma med sniper – släpp för att skjuta</td></tr>
+<tr><td>Esc eller M</td><td>Meny / lämna matchen</td></tr>
+</table>
+</div>
+
+<div class="cta">
+<h2>Redo att vinna?</h2>
+<a class="btn" href="spel.html">▶ SPELA NU</a>
+</div>
+
+<footer>noka.pl · gjort med block ♥</footer>
+</div>
+</body>
+</html>
