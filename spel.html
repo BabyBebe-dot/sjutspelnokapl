@@ -2,118 +2,276 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="utf-8">
-<title>noka.pl – blockskjutare</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noka – Blockspel</title>
 <style>
-:root {
---bg:#eef7e6;
---fg:#1c2a14;
---card:#ffffff;
---line:#1c2a14;
---green:#3fae3a;
---dirt:#7a5232;
---sky:#8fd3ff;
---accent:#ffcf33;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #18251a;
+  color: white;
+  font-family: monospace;
+  text-align: center;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:monospace;line-height:1.55}
-a{color:inherit}
-.wrap{max-width:980px;margin:auto;padding:0 18px}
-nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0;gap:12px;flex-wrap:wrap}
-nav b{font-size:22px}
-nav a{margin-left:16px;text-decoration:none;font-weight:bold}
-.hero{background:var(--sky);border:4px solid var(--line);margin-top:6px;position:relative;overflow:hidden;text-align:center;padding:48px 18px 90px}
-.hero h1{font-size:clamp(40px,10vw,84px);margin:0;color:white;text-shadow:4px 4px 0 var(--line)}
-.hero p{font-size:clamp(16px,3.5vw,21px);max-width:560px;margin:12px auto 26px;font-weight:bold}
-.btn{display:inline-block;background:var(--accent);color:#1c2a14;font-weight:bold;font-size:22px;padding:14px 30px;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line);text-decoration:none}
-.btn:hover{transform:translate(2px,2px)}
-.ground{position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(90deg,var(--green) 0 40px,#379a33 40px 80px);border-top:4px solid var(--line)}
-.ground::after{content:"";position:absolute;left:0;right:0;top:16px;bottom:0;background:repeating-linear-gradient(90deg,var(--dirt) 0 40px,#6a4528 40px 80px)}
-.guy{position:absolute;bottom:42px;width:30px;height:62px}
-.guy i{position:absolute;display:block;border:2px solid var(--line)}
-.guy .h{left:5px;top:0;width:20px;height:20px;background:#f0c090}
-.guy .b{left:3px;top:20px;width:24px;height:24px}
-.guy .l{left:3px;top:44px;width:24px;height:18px;background:#2b3a67}
-.g1{left:10%}.g1 .b{background:#3b78d8}
-.g2{right:12%;transform:scale(1.6);transform-origin:bottom}.g2 .b{background:#c01818}
-.g3{left:26%}.g3 .b{background:#f2c21b}
-h2{font-size:30px;margin:54px 0 16px;text-shadow:3px 3px 0 var(--accent)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.card{background:var(--card);border:4px solid var(--line);padding:14px 16px;box-shadow:5px 5px 0 var(--line)}
-.card h3{margin:0 0 6px;font-size:19px}
-.card p{margin:0}
-.tier{display:inline-block;font-size:13px;font-weight:bold;padding:1px 8px;border:2px solid var(--line);color:#111}
-.t1{background:#ff8a8a}.t2{background:#ddd}.t3{background:#8af58a}.t4{background:#e19bff}
-table{width:100%;border-collapse:collapse;background:var(--card);border:4px solid var(--line)}
-th,td{padding:8px 12px;text-align:left;border-bottom:2px solid var(--line)}
-th{background:var(--accent);color:#1c2a14}
-.scroll{overflow-x:auto}
-.cta{text-align:center;margin:60px 0 30px;padding:34px 18px;background:var(--green);border:4px solid var(--line);color:white}
-.cta h2{margin-top:0;text-shadow:3px 3px 0 var(--line)}
-footer{text-align:center;padding:24px 0 36px;opacity:.75;font-size:14px}
+h1 { color: #8cff70; }
+#info {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  font-size: 18px;
+  margin: 10px;
+}
+canvas {
+  background: #8fd3ff;
+  border: 5px solid white;
+  width: min(95vw, 900px);
+  height: auto;
+  image-rendering: pixelated;
+}
+button {
+  padding: 12px 22px;
+  margin: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  border: 3px solid white;
+  background: #8cff70;
+  cursor: pointer;
+}
+#controls { margin: 10px; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<nav>
-<b>🟩 noka.pl</b>
+<h1>🟩 NOKA – BLOCKSPEL</h1>
+
+<div id="info">
+  <span>Poäng: <b id="score">0</b></span>
+  <span>Mynt: <b id="coins">0</b></span>
+</div>
+
+<canvas id="game" width="900" height="500"></canvas>
+
 <div>
-<a href="#spel">Spelet</a>
-<a href="#gubbar">Gubbar</a>
-<a href="#styrning">Styrning</a>
-</div>
-</nav>
-
-<header class="hero">
-<h1>noka.pl</h1>
-<p>Blockig skjutarkamp i första person. Ett liv. Alla mot alla. Bara en kan vinna.</p>
-<a class="btn" href="spel.html">▶ SPELA NU</a>
-<div class="guy g3"><i class="h"></i><i class="b"></i><i class="l"></i></div>
-<div class="guy g1"><i class="h"></i><i class="b"></i><i class="l"></i></div>
-<div class="guy g2"><i class="h"></i><i class="b"></i><i class="l"></i></div>
-<div class="ground"></div>
-</header>
-
-<h2 id="spel">Vad är det här?</h2>
-<div class="grid">
-<div class="card"><h3>🧱 Allt är kvadrat</h3><p>En värld av block, som i Minecraft. Hoppa över kullar och göm dig bakom block.</p></div>
-<div class="card"><h3>💀 Ett liv</h3><p>Dör du är det game over. Skjut först, skjut rätt.</p></div>
-<div class="card"><h3>🔫 Glock och sniper</h3><p>Snabb Glock i ena handen, kraftfull sniper med zoom i den andra.</p></div>
-<div class="card"><h3>👹 Bossar</h3><p>En jättestor boss med horn och 350 liv väntar på dig i sololäget.</p></div>
-<div class="card"><h3>🌐 Online med kod</h3><p>Skapa ett rum, skicka koden och spela mot riktiga människor. Max 10 per rum.</p></div>
-<div class="card"><h3>🏆 Troféer och statistik</h3><p>Vinn troféer, lås upp nya gubbar och följ din statistik.</p></div>
+  <button onclick="startGame()">▶ STARTA SPELET</button>
 </div>
 
-<h2 id="gubbar">Gubbarna – 67</h2>
-<div class="grid">
-<div class="card"><h3>67</h3><span class="tier t1">Dålig</span><p>60 liv · långsam · svag skada.<br>Från start.</p></div>
-<div class="card"><h3>67</h3><span class="tier t2">Medel</span><p>100 liv · helt okej på allt.<br>Från start.</p></div>
-<div class="card"><h3>67</h3><span class="tier t3">Bra</span><p>85 liv · supersnabb.<br>30 troféer.</p></div>
-<div class="card"><h3>67</h3><span class="tier t3">Bra</span><p>180 liv · stor och tålig.<br>60 troféer.</p></div>
-<div class="card"><h3>67</h3><span class="tier t4">Episk</span><p>130 liv · snabb · 130 % skada.<br>120 troféer.</p></div>
+<div id="controls">
+  <p>W A S D = Gå | Mellanslag = Hoppa</p>
+  <p>Samla mynt och undvik de röda blocken!</p>
 </div>
 
-<h2 id="styrning">Styrning</h2>
-<div class="scroll">
-<table>
-<tr><th>Tangent</th><th>Gör</th></tr>
-<tr><td>W A S D</td><td>Gå</td></tr>
-<tr><td>Mellanslag</td><td>Hoppa</td></tr>
-<tr><td>Musen</td><td>Titta</td></tr>
-<tr><td>G eller vänster musknapp</td><td>Skjut med Glock</td></tr>
-<tr><td>Håll O eller höger musknapp</td><td>Zooma med sniper – släpp för att skjuta</td></tr>
-<tr><td>Esc eller M</td><td>Meny / lämna matchen</td></tr>
-</table>
-</div>
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-<div class="cta">
-<h2>Redo att vinna?</h2>
-<a class="btn" href="spel.html">▶ SPELA NU</a>
-</div>
+let player, enemies, coins, score, coinCount;
+let keys = {};
+let running = false;
+let gameOver = false;
+let camera = 0;
+let frame = 0;
 
-<footer>noka.pl · gjort med block ♥</footer>
-</div>
+function resetGame() {
+  player = {
+    x: 80, y: 350, w: 30, h: 40,
+    vx: 0, vy: 0, onGround: false
+  };
+
+  enemies = [
+    {x: 450, y: 410, w: 35, h: 35, vx: 2},
+    {x: 750, y: 410, w: 35, h: 35, vx: 2.5},
+    {x: 1100, y: 410, w: 35, h: 35, vx: 3}
+  ];
+
+  coins = [];
+  for (let i = 0; i < 18; i++) {
+    coins.push({
+      x: 250 + i * 100,
+      y: 300 - (i % 3) * 65,
+      taken: false
+    });
+  }
+
+  score = 0;
+  coinCount = 0;
+  camera = 0;
+  frame = 0;
+  gameOver = false;
+}
+
+function startGame() {
+  resetGame();
+  running = true;
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener("keydown", e => {
+  keys[e.key.toLowerCase()] = true;
+  if (e.code === "Space") {
+    keys.space = true;
+    e.preventDefault();
+  }
+});
+
+document.addEventListener("keyup", e => {
+  keys[e.key.toLowerCase()] = false;
+  if (e.code === "Space") keys.space = false;
+});
+
+function drawBlock(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x - camera, y, w, h);
+  ctx.strokeStyle = "#172317";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x - camera, y, w, h);
+}
+
+function update() {
+  frame++;
+
+  if (keys.a || keys.arrowleft) player.vx = -4;
+  else if (keys.d || keys.arrowright) player.vx = 4;
+  else player.vx *= 0.8;
+
+  if ((keys.space || keys.w || keys.arrowup) && player.onGround) {
+    player.vy = -12;
+    player.onGround = false;
+  }
+
+  player.x += player.vx;
+  player.y += player.vy;
+  player.vy += 0.55;
+
+  if (player.y + player.h >= 450) {
+    player.y = 450 - player.h;
+    player.vy = 0;
+    player.onGround = true;
+  }
+
+  if (player.x < 0) player.x = 0;
+
+  camera = Math.max(0, player.x - 250);
+
+  enemies.forEach(enemy => {
+    enemy.x += enemy.vx;
+    if (enemy.x < 350 || enemy.x > 1500) {
+      enemy.vx *= -1;
+    }
+
+    if (
+      player.x < enemy.x + enemy.w &&
+      player.x + player.w > enemy.x &&
+      player.y < enemy.y + enemy.h &&
+      player.y + player.h > enemy.y
+    ) {
+      running = false;
+      gameOver = true;
+    }
+  });
+
+  coins.forEach(coin => {
+    if (!coin.taken &&
+      player.x < coin.x + 20 &&
+      player.x + player.w > coin.x &&
+      player.y < coin.y + 20 &&
+      player.y + player.h > coin.y) {
+      coin.taken = true;
+      coinCount++;
+      score += 10;
+    }
+  });
+
+  score += 1;
+  document.getElementById("score").textContent = score;
+  document.getElementById("coins").textContent = coinCount;
+
+  if (player.x > 1800) {
+    running = false;
+    gameOver = true;
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, 900, 500);
+
+  // Himmel
+  ctx.fillStyle = "#8fd3ff";
+  ctx.fillRect(0, 0, 900, 500);
+
+  // Moln
+  ctx.fillStyle = "white";
+  for (let i = 0; i < 8; i++) {
+    let x = ((i * 170 - camera * 0.3) % 1100 + 1100) % 1100;
+    ctx.fillRect(x, 70 + (i % 3) * 35, 65, 20);
+    ctx.fillRect(x + 15, 55 + (i % 3) * 35, 35, 20);
+  }
+
+  // Mark
+  ctx.fillStyle = "#399c39";
+  ctx.fillRect(0, 450, 900, 50);
+
+  ctx.fillStyle = "#80502e";
+  ctx.fillRect(0, 475, 900, 25);
+
+  // Plattformar
+  for (let i = 0; i < 10; i++) {
+    drawBlock(i * 220, 420, 50, 30, "#986536");
+  }
+
+  // Mynt
+  coins.forEach(coin => {
+    if (!coin.taken) {
+      ctx.fillStyle = "#ffd52e";
+      ctx.beginPath();
+      ctx.arc(coin.x - camera + 10, coin.y + 10, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#a87500";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+  });
+
+  // Fiender
+  enemies.forEach(enemy => {
+    drawBlock(enemy.x, enemy.y, enemy.w, enemy.h, "#e43d3d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(enemy.x - camera + 7, enemy.y + 8, 6, 6);
+    ctx.fillRect(enemy.x - camera + 22, enemy.y + 8, 6, 6);
+  });
+
+  // Spelare
+  drawBlock(player.x, player.y, player.w, player.h, "#2864db");
+  ctx.fillStyle = "#f2c090";
+  ctx.fillRect(player.x - camera + 5, player.y + 3, 20, 13);
+  ctx.fillStyle = "#172317";
+  ctx.fillRect(player.x - camera + 10, player.y + 8, 4, 4);
+  ctx.fillRect(player.x - camera + 20, player.y + 8, 4, 4);
+
+  if (gameOver) {
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.fillRect(0, 0, 900, 500);
+    ctx.fillStyle = "white";
+    ctx.font = "bold 48px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      player.x > 1800 ? "DU VANN!" : "GAME OVER",
+      450, 220
+    );
+    ctx.font = "22px monospace";
+    ctx.fillText("Tryck på STARTA SPELET igen", 450, 275);
+  }
+}
+
+function loop() {
+  if (!running) return;
+  update();
+  draw();
+  if (running) requestAnimationFrame(loop);
+}
+
+resetGame();
+draw();
+</script>
 </body>
 </html>
