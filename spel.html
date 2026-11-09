@@ -124,11 +124,14 @@ input{
 
 <div id="menu">
   <div class="card">
+
     <h1>🎮 NOKA</h1>
 
-    <input id="roomInput"
-           maxlength="6"
-           placeholder="Skriv rumskod">
+    <input
+      id="roomInput"
+      maxlength="6"
+      placeholder="Skriv rumskod"
+    >
 
     <button id="createBtn">
       SKAPA RUM
@@ -139,10 +142,12 @@ input{
     </button>
 
     <div id="status"></div>
+
   </div>
 </div>
 
 <div id="game">
+
   <div id="hud">
     🎮 NOKA<br>
     Rum: <span id="room">---</span><br>
@@ -156,6 +161,7 @@ input{
     Mus = titta &nbsp; | &nbsp;
     ESC = meny
   </div>
+
 </div>
 
 <script type="module">
@@ -195,23 +201,52 @@ const firebaseConfig = {
   measurementId: "G-BJQ85GZMGZ"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+let app;
+let auth;
+let db;
+
+try {
+
+  app = initializeApp(firebaseConfig);
+
+  auth = getAuth(app);
+
+  db = getDatabase(app);
+
+} catch(error) {
+
+  console.error(error);
+
+}
 
 
 /* =========================
    ELEMENT
 ========================= */
 
-const menu = document.getElementById("menu");
-const game = document.getElementById("game");
-const roomInput = document.getElementById("roomInput");
-const createBtn = document.getElementById("createBtn");
-const joinBtn = document.getElementById("joinBtn");
-const statusText = document.getElementById("status");
-const roomText = document.getElementById("room");
-const playersText = document.getElementById("players");
+const menu =
+  document.getElementById("menu");
+
+const game =
+  document.getElementById("game");
+
+const roomInput =
+  document.getElementById("roomInput");
+
+const createBtn =
+  document.getElementById("createBtn");
+
+const joinBtn =
+  document.getElementById("joinBtn");
+
+const statusText =
+  document.getElementById("status");
+
+const roomText =
+  document.getElementById("room");
+
+const playersText =
+  document.getElementById("players");
 
 
 /* =========================
@@ -219,11 +254,12 @@ const playersText = document.getElementById("players");
 ========================= */
 
 let user = null;
+
 let roomId = null;
 
 let player = {
-  x: 0,
-  z: 0
+  x:0,
+  z:0
 };
 
 const players = {};
@@ -235,19 +271,47 @@ const keys = {};
    AUTH
 ========================= */
 
-signInAnonymously(auth)
-  .catch(error => {
-    console.error(error);
-    statusText.textContent =
-      "Firebase-inloggningen misslyckades.";
+if(auth){
+
+  signInAnonymously(auth)
+
+    .then(() => {
+
+      statusText.textContent =
+        "Firebase ansluter...";
+
+    })
+
+    .catch(error => {
+
+      console.error(error);
+
+      statusText.textContent =
+        "Firebase-fel: " +
+        error.code;
+
+    });
+
+
+  onAuthStateChanged(auth, u => {
+
+    if(u){
+
+      user = u;
+
+      statusText.textContent =
+        "Firebase ansluten ✓";
+
+      console.log(
+        "Spelare ansluten:",
+        user.uid
+      );
+
+    }
+
   });
 
-onAuthStateChanged(auth, u => {
-  if (u) {
-    user = u;
-    console.log("Spelare ansluten:", user.uid);
-  }
-});
+}
 
 
 /* =========================
@@ -256,15 +320,23 @@ onAuthStateChanged(auth, u => {
 
 function makeRoomCode(){
 
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
   let code = "";
 
   for(let i=0;i<6;i++){
-    code += chars[Math.floor(Math.random()*chars.length)];
+
+    code += chars[
+      Math.floor(
+        Math.random()*chars.length
+      )
+    ];
+
   }
 
   return code;
+
 }
 
 
@@ -275,29 +347,53 @@ function makeRoomCode(){
 createBtn.onclick = async () => {
 
   if(!user){
+
     statusText.textContent =
-      "Vänta lite på Firebase...";
+      "Firebase är inte ansluten ännu.";
+
     return;
+
   }
 
-  const code = makeRoomCode();
+  try{
 
-  roomId = code;
+    const code =
+      makeRoomCode();
 
-  player.x = 0;
-  player.z = 0;
+    roomId = code;
 
-  await set(
-    ref(db, "rooms/" + roomId + "/players/" + user.uid),
-    {
-      x: player.x,
-      z: player.z
-    }
-  );
+    player.x = 0;
+    player.z = 0;
 
-  startGame();
+    await set(
+      ref(
+        db,
+        "rooms/" +
+        roomId +
+        "/players/" +
+        user.uid
+      ),
+      {
+        x:player.x,
+        z:player.z
+      }
+    );
 
-  listenToPlayers();
+    startGame();
+
+    listenToPlayers();
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    statusText.textContent =
+      "Firebase-fel: " +
+      error.code;
+
+  }
 
 };
 
@@ -309,18 +405,26 @@ createBtn.onclick = async () => {
 joinBtn.onclick = async () => {
 
   if(!user){
+
     statusText.textContent =
-      "Vänta lite på Firebase...";
+      "Firebase är inte ansluten ännu.";
+
     return;
+
   }
 
   const code =
-    roomInput.value.trim().toUpperCase();
+    roomInput.value
+      .trim()
+      .toUpperCase();
 
   if(code.length !== 6){
+
     statusText.textContent =
       "Skriv en rumskod på 6 tecken.";
+
     return;
+
   }
 
   roomId = code;
@@ -331,10 +435,16 @@ joinBtn.onclick = async () => {
   try{
 
     await set(
-      ref(db, "rooms/" + roomId + "/players/" + user.uid),
+      ref(
+        db,
+        "rooms/" +
+        roomId +
+        "/players/" +
+        user.uid
+      ),
       {
-        x: player.x,
-        z: player.z
+        x:player.x,
+        z:player.z
       }
     );
 
@@ -342,12 +452,15 @@ joinBtn.onclick = async () => {
 
     listenToPlayers();
 
-  }catch(error){
+  }
+
+  catch(error){
 
     console.error(error);
 
     statusText.textContent =
-      "Kunde inte gå med i rummet.";
+      "Firebase-fel: " +
+      error.code;
 
   }
 
@@ -360,20 +473,26 @@ joinBtn.onclick = async () => {
 
 function startGame(){
 
-  menu.style.display = "none";
-  game.style.display = "block";
+  menu.style.display =
+    "none";
 
-  roomText.textContent = roomId;
+  game.style.display =
+    "block";
+
+  roomText.textContent =
+    roomId;
 
   createWorld();
 
-  window.requestAnimationFrame(loop);
+  window.requestAnimationFrame(
+    loop
+  );
 
 }
 
 
 /* =========================
-   3D-LIKNANDE VÄRLD
+   WORLD
 ========================= */
 
 function createWorld(){
@@ -385,10 +504,17 @@ function createWorld(){
   const world =
     document.getElementById("world");
 
-  world.style.position = "absolute";
-  world.style.inset = "0";
+  world.style.position =
+    "absolute";
+
+  world.style.inset =
+    "0";
+
   world.style.background = `
-    linear-gradient(#77b5e8 0 48%, #4b8c3c 48% 100%)
+    linear-gradient(
+      #77b5e8 0 48%,
+      #4b8c3c 48% 100%
+    )
   `;
 
   for(let i=0;i<35;i++){
@@ -396,18 +522,24 @@ function createWorld(){
     const block =
       document.createElement("div");
 
-    block.style.position = "absolute";
+    block.style.position =
+      "absolute";
+
     block.style.width =
-      (40 + Math.random()*70) + "px";
+      (40 + Math.random()*70) +
+      "px";
 
     block.style.height =
-      (40 + Math.random()*70) + "px";
+      (40 + Math.random()*70) +
+      "px";
 
     block.style.left =
-      Math.random()*95 + "%";
+      Math.random()*95 +
+      "%";
 
     block.style.top =
-      (50 + Math.random()*40) + "%";
+      (50 + Math.random()*40) +
+      "%";
 
     block.style.background =
       "#6b4f32";
@@ -418,7 +550,10 @@ function createWorld(){
     block.style.boxShadow =
       "inset 0 10px #79b84b";
 
-    world.appendChild(block);
+    world.appendChild(
+      block
+    );
+
   }
 
 }
@@ -428,17 +563,27 @@ function createWorld(){
    KEYBOARD
 ========================= */
 
-document.addEventListener("keydown", e => {
+document.addEventListener(
+  "keydown",
+  e => {
 
-  keys[e.key.toLowerCase()] = true;
+    keys[
+      e.key.toLowerCase()
+    ] = true;
 
-});
+  }
+);
 
-document.addEventListener("keyup", e => {
+document.addEventListener(
+  "keyup",
+  e => {
 
-  keys[e.key.toLowerCase()] = false;
+    keys[
+      e.key.toLowerCase()
+    ] = false;
 
-});
+  }
+);
 
 
 /* =========================
@@ -473,19 +618,32 @@ async function sendPosition(){
   if(!user || !roomId)
     return;
 
-  await update(
-    ref(
-      db,
-      "rooms/" +
-      roomId +
-      "/players/" +
-      user.uid
-    ),
-    {
-      x: player.x,
-      z: player.z
-    }
-  );
+  try{
+
+    await update(
+      ref(
+        db,
+        "rooms/" +
+        roomId +
+        "/players/" +
+        user.uid
+      ),
+      {
+        x:player.x,
+        z:player.z
+      }
+    );
+
+  }
+
+  catch(error){
+
+    console.error(
+      "Position-fel:",
+      error
+    );
+
+  }
 
 }
 
@@ -497,28 +655,47 @@ async function sendPosition(){
 function listenToPlayers(){
 
   const roomRef =
-    ref(db, "rooms/" + roomId + "/players");
+    ref(
+      db,
+      "rooms/" +
+      roomId +
+      "/players"
+    );
 
-  onValue(roomRef, snapshot => {
+  onValue(
+    roomRef,
+    snapshot => {
 
-    const data = snapshot.val() || {};
+      const data =
+        snapshot.val() || {};
 
-    const count =
-      Object.keys(data).length;
+      const count =
+        Object.keys(data)
+          .length;
 
-    playersText.textContent =
-      "Spelare: " + count;
+      playersText.textContent =
+        "Spelare: " +
+        count;
 
-    for(const id in data){
+      for(const id in data){
 
-      if(id === user.uid)
-        continue;
+        if(id === user.uid)
+          continue;
 
-      players[id] = data[id];
+        players[id] =
+          data[id];
+
+      }
+
+    },
+    error => {
+
+      statusText.textContent =
+        "Läsfel: " +
+        error.code;
 
     }
-
-  });
+  );
 
 }
 
@@ -533,22 +710,23 @@ function loop(time){
 
   move();
 
-  /*
-   Skicka spelarens position
-   ungefär 10 gånger per sekund.
-  */
-
-  if(time - lastSend > 100){
+  if(
+    time-lastSend >
+    100
+  ){
 
     sendPosition();
 
-    lastSend = time;
+    lastSend =
+      time;
 
   }
 
   render();
 
-  requestAnimationFrame(loop);
+  requestAnimationFrame(
+    loop
+  );
 
 }
 
@@ -559,31 +737,32 @@ function loop(time){
 
 function render(){
 
-  /*
-   Enkel blockig multiplayer-visning.
-  */
-
-  let world =
-    document.getElementById("world");
+  const world =
+    document.getElementById(
+      "world"
+    );
 
   if(!world)
     return;
 
-  /*
-   Ta bort gamla spelare.
-  */
-
   document
-    .querySelectorAll(".otherPlayer")
-    .forEach(el => el.remove());
-
+    .querySelectorAll(
+      ".otherPlayer"
+    )
+    .forEach(
+      el =>
+        el.remove()
+    );
 
   for(const id in players){
 
-    const p = players[id];
+    const p =
+      players[id];
 
     const el =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     el.className =
       "otherPlayer";
@@ -603,15 +782,15 @@ function render(){
     el.style.border =
       "4px solid #222";
 
-    /*
-     Gör en enkel kameraeffekt.
-    */
-
     const screenX =
-      50 + (p.x - player.x) * 0.15;
+      50 +
+      (p.x-player.x) *
+      0.15;
 
     const screenY =
-      55 + (p.z - player.z) * 0.08;
+      55 +
+      (p.z-player.z) *
+      0.08;
 
     el.style.left =
       screenX + "%";
@@ -619,7 +798,9 @@ function render(){
     el.style.top =
       screenY + "%";
 
-    world.appendChild(el);
+    world.appendChild(
+      el
+    );
 
   }
 
@@ -630,24 +811,27 @@ function render(){
    DISCONNECT
 ========================= */
 
-window.addEventListener("beforeunload", () => {
+window.addEventListener(
+  "beforeunload",
+  () => {
 
-  if(user && roomId){
+    if(user && roomId){
 
-    set(
-      ref(
-        db,
-        "rooms/" +
-        roomId +
-        "/players/" +
-        user.uid
-      ),
-      null
-    );
+      set(
+        ref(
+          db,
+          "rooms/" +
+          roomId +
+          "/players/" +
+          user.uid
+        ),
+        null
+      );
+
+    }
 
   }
-
-});
+);
 
 </script>
 
