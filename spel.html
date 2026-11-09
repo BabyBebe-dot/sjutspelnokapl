@@ -1,839 +1,254 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Noka Multiplayer</title>
-
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  overflow:hidden;
-  background:#111;
-  font-family:Arial,sans-serif;
-}
-#menu{
-  position:fixed;
-  inset:0;
-  z-index:10;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#101820,#253b22);
-}
-.card{
-  width:360px;
-  max-width:90%;
-  padding:30px;
-  background:#fff;
-  border-radius:18px;
-  text-align:center;
-  box-shadow:0 15px 50px #0008;
-}
-h1{
-  margin-top:0;
-  font-size:42px;
-}
-button,input{
-  width:100%;
-  padding:13px;
-  margin-top:10px;
-  border:0;
-  border-radius:10px;
-  font-size:16px;
-}
-button{
-  background:#222;
-  color:white;
-  cursor:pointer;
-}
-button:hover{
-  background:#444;
-}
-input{
-  border:2px solid #ddd;
-}
-#status{
-  min-height:22px;
-  margin-top:12px;
-  color:#c00;
-}
-#game{
-  display:none;
-  width:100vw;
-  height:100vh;
-}
-#hud{
-  position:fixed;
-  z-index:5;
-  top:15px;
-  left:15px;
-  color:white;
-  background:#0009;
-  padding:12px 15px;
-  border-radius:12px;
-}
-#room{
-  font-weight:bold;
-}
-#players{
-  margin-top:5px;
-}
-#crosshair{
-  position:fixed;
-  z-index:6;
-  left:50%;
-  top:50%;
-  width:18px;
-  height:18px;
-  transform:translate(-50%,-50%);
-}
-#crosshair:before,
-#crosshair:after{
-  content:"";
-  position:absolute;
-  background:white;
-}
-#crosshair:before{
-  width:18px;
-  height:2px;
-  top:8px;
-}
-#crosshair:after{
-  width:2px;
-  height:18px;
-  left:8px;
-}
-#info{
-  position:fixed;
-  z-index:6;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  color:white;
-  background:#0009;
-  padding:9px 14px;
-  border-radius:10px;
-  font-size:13px;
-}
+body{margin:0;overflow:hidden;background:#111;font-family:Arial,sans-serif}
+#menu{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#101820,#253b22)}
+.card{width:360px;max-width:90%;padding:30px;background:white;border-radius:18px;text-align:center;box-shadow:0 15px 50px #0008}
+h1{margin-top:0;font-size:42px}
+button,input{width:100%;padding:13px;margin-top:10px;border:0;border-radius:10px;font-size:16px}
+button{background:#222;color:white;cursor:pointer}
+button:hover{background:#444}
+input{border:2px solid #ddd}
+#status{min-height:22px;margin-top:12px;color:#c00;overflow-wrap:anywhere}
+#game{display:none;width:100vw;height:100vh}
+#hud{position:fixed;z-index:5;top:15px;left:15px;color:white;background:#0009;padding:12px 15px;border-radius:12px}
+#room{font-weight:bold}
+#players{margin-top:5px}
+#crosshair{position:fixed;z-index:6;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%)}
+#crosshair:before,#crosshair:after{content:"";position:absolute;background:white}
+#crosshair:before{width:18px;height:2px;top:8px}
+#crosshair:after{width:2px;height:18px;left:8px}
+#info{position:fixed;z-index:6;bottom:15px;left:50%;transform:translateX(-50%);color:white;background:#0009;padding:9px 14px;border-radius:10px;font-size:13px}
 </style>
 </head>
-
 <body>
 
 <div id="menu">
   <div class="card">
-
     <h1>🎮 NOKA</h1>
-
-    <input
-      id="roomInput"
-      maxlength="6"
-      placeholder="Skriv rumskod"
-    >
-
-    <button id="createBtn">
-      SKAPA RUM
-    </button>
-
-    <button id="joinBtn">
-      GÅ MED I RUM
-    </button>
-
-    <div id="status"></div>
-
+    <input id="roomInput" maxlength="6" placeholder="Skriv rumskod">
+    <button id="createBtn">SKAPA RUM</button>
+    <button id="joinBtn">GÅ MED I RUM</button>
+    <div id="status">Ansluter till Firebase...</div>
   </div>
 </div>
 
 <div id="game">
-
   <div id="hud">
     🎮 NOKA<br>
     Rum: <span id="room">---</span><br>
     <span id="players">Spelare: 1</span>
   </div>
-
   <div id="crosshair"></div>
-
-  <div id="info">
-    WASD = gå &nbsp; | &nbsp;
-    Mus = titta &nbsp; | &nbsp;
-    ESC = meny
-  </div>
-
+  <div id="info">WASD = gå &nbsp; | &nbsp; Mus = titta &nbsp; | &nbsp; ESC = meny</div>
 </div>
 
 <script type="module">
-
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-
-import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-
-import {
-  getDatabase,
-  ref,
-  set,
-  update,
-  onValue,
-  onDisconnect
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
-
-
-/* =========================
-   FIREBASE
-========================= */
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,signInAnonymously,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getDatabase,ref,set,update,onValue,onDisconnect} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC0fW1AdOPkCf6n6dZ0CYQnWrV1wRmh990",
+  apiKey: "AIzaSyC8fWAd0PKcFC6h6dZ0CYQnWRv1w0Rhm90",
   authDomain: "randompl.firebaseapp.com",
   databaseURL: "https://randompl-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "randompl",
   storageBucket: "randompl.firebasestorage.app",
   messagingSenderId: "787540145240",
-  appId: "1:787540145240:web:13584e8347fe6ce06862d",
+  appId: "1:787540145240:web:1358498a347fe6ce06862d",
   measurementId: "G-BJQ85GZMGZ"
 };
 
-let app;
-let auth;
-let db;
+const menu=document.getElementById("menu");
+const game=document.getElementById("game");
+const roomInput=document.getElementById("roomInput");
+const createBtn=document.getElementById("createBtn");
+const joinBtn=document.getElementById("joinBtn");
+const statusText=document.getElementById("status");
+const roomText=document.getElementById("room");
+const playersText=document.getElementById("players");
 
-try {
+let app,auth,db,user=null,roomId=null;
+let player={x:0,z:0};
+const players={};
+const keys={};
 
-  app = initializeApp(firebaseConfig);
+try{
+  app=initializeApp(firebaseConfig);
+  auth=getAuth(app);
+  db=getDatabase(app);
 
-  auth = getAuth(app);
-
-  db = getDatabase(app);
-
-} catch(error) {
-
-  console.error(error);
-
-}
-
-
-/* =========================
-   ELEMENT
-========================= */
-
-const menu =
-  document.getElementById("menu");
-
-const game =
-  document.getElementById("game");
-
-const roomInput =
-  document.getElementById("roomInput");
-
-const createBtn =
-  document.getElementById("createBtn");
-
-const joinBtn =
-  document.getElementById("joinBtn");
-
-const statusText =
-  document.getElementById("status");
-
-const roomText =
-  document.getElementById("room");
-
-const playersText =
-  document.getElementById("players");
-
-
-/* =========================
-   PLAYER
-========================= */
-
-let user = null;
-
-let roomId = null;
-
-let player = {
-  x:0,
-  z:0
-};
-
-const players = {};
-
-const keys = {};
-
-
-/* =========================
-   AUTH
-========================= */
-
-if(auth){
-
-  signInAnonymously(auth)
-
-    .then(() => {
-
-      statusText.textContent =
-        "Firebase ansluter...";
-
-    })
-
-    .catch(error => {
-
-      console.error(error);
-
-      statusText.textContent =
-        "Firebase-fel: " +
-        error.code;
-
-    });
-
-
-  onAuthStateChanged(auth, u => {
-
-    if(u){
-
-      user = u;
-
-      statusText.textContent =
-        "Firebase ansluten ✓";
-
-      console.log(
-        "Spelare ansluten:",
-        user.uid
-      );
-
-    }
-
+  signInAnonymously(auth).catch(error=>{
+    console.error(error);
+    statusText.textContent="Inloggningsfel: "+error.code;
   });
 
+  onAuthStateChanged(auth,u=>{
+    if(u){
+      user=u;
+      statusText.textContent="Firebase ansluten! Du kan skapa ett rum.";
+    }
+  });
+}catch(error){
+  console.error(error);
+  statusText.textContent="Firebase-fel: "+error.message;
 }
-
-
-/* =========================
-   ROOM CODE
-========================= */
 
 function makeRoomCode(){
-
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-  let code = "";
-
-  for(let i=0;i<6;i++){
-
-    code += chars[
-      Math.floor(
-        Math.random()*chars.length
-      )
-    ];
-
-  }
-
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code="";
+  for(let i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
   return code;
-
 }
 
-
-/* =========================
-   CREATE ROOM
-========================= */
-
-createBtn.onclick = async () => {
-
+async function enterRoom(code){
   if(!user){
-
-    statusText.textContent =
-      "Firebase är inte ansluten ännu.";
-
+    statusText.textContent="Vänta på Firebase-inloggningen.";
     return;
-
   }
+
+  roomId=code;
+  player.x=0;
+  player.z=0;
 
   try{
-
-    const code =
-      makeRoomCode();
-
-    roomId = code;
-
-    player.x = 0;
-    player.z = 0;
-
-    await set(
-      ref(
-        db,
-        "rooms/" +
-        roomId +
-        "/players/" +
-        user.uid
-      ),
-      {
-        x:player.x,
-        z:player.z
-      }
-    );
-
+    const playerRef=ref(db,"rooms/"+roomId+"/players/"+user.uid);
+    await set(playerRef,{x:player.x,z:player.z});
+    await onDisconnect(playerRef).remove();
     startGame();
-
     listenToPlayers();
-
-  }
-
-  catch(error){
-
+  }catch(error){
     console.error(error);
-
-    statusText.textContent =
-      "Firebase-fel: " +
-      error.code;
-
+    statusText.textContent="Firebase-fel: "+error.code;
   }
+}
 
-};
+createBtn.onclick=()=>enterRoom(makeRoomCode());
 
-
-/* =========================
-   JOIN ROOM
-========================= */
-
-joinBtn.onclick = async () => {
-
-  if(!user){
-
-    statusText.textContent =
-      "Firebase är inte ansluten ännu.";
-
+joinBtn.onclick=()=>{
+  const code=roomInput.value.trim().toUpperCase();
+  if(code.length!==6){
+    statusText.textContent="Skriv en rumskod på 6 tecken.";
     return;
-
   }
-
-  const code =
-    roomInput.value
-      .trim()
-      .toUpperCase();
-
-  if(code.length !== 6){
-
-    statusText.textContent =
-      "Skriv en rumskod på 6 tecken.";
-
-    return;
-
-  }
-
-  roomId = code;
-
-  player.x = 0;
-  player.z = 0;
-
-  try{
-
-    await set(
-      ref(
-        db,
-        "rooms/" +
-        roomId +
-        "/players/" +
-        user.uid
-      ),
-      {
-        x:player.x,
-        z:player.z
-      }
-    );
-
-    startGame();
-
-    listenToPlayers();
-
-  }
-
-  catch(error){
-
-    console.error(error);
-
-    statusText.textContent =
-      "Firebase-fel: " +
-      error.code;
-
-  }
-
+  enterRoom(code);
 };
-
-
-/* =========================
-   START
-========================= */
 
 function startGame(){
-
-  menu.style.display =
-    "none";
-
-  game.style.display =
-    "block";
-
-  roomText.textContent =
-    roomId;
-
+  menu.style.display="none";
+  game.style.display="block";
+  roomText.textContent=roomId;
   createWorld();
-
-  window.requestAnimationFrame(
-    loop
-  );
-
+  requestAnimationFrame(loop);
 }
-
-
-/* =========================
-   WORLD
-========================= */
 
 function createWorld(){
+  const old=document.getElementById("world");
+  if(old)old.remove();
 
-  game.innerHTML += `
-    <div id="world"></div>
-  `;
-
-  const world =
-    document.getElementById("world");
-
-  world.style.position =
-    "absolute";
-
-  world.style.inset =
-    "0";
-
-  world.style.background = `
-    linear-gradient(
-      #77b5e8 0 48%,
-      #4b8c3c 48% 100%
-    )
-  `;
+  const world=document.createElement("div");
+  world.id="world";
+  world.style.position="absolute";
+  world.style.inset="0";
+  world.style.background="linear-gradient(#77b5e8 0 48%,#4b8c3c 48% 100%)";
+  game.appendChild(world);
 
   for(let i=0;i<35;i++){
-
-    const block =
-      document.createElement("div");
-
-    block.style.position =
-      "absolute";
-
-    block.style.width =
-      (40 + Math.random()*70) +
-      "px";
-
-    block.style.height =
-      (40 + Math.random()*70) +
-      "px";
-
-    block.style.left =
-      Math.random()*95 +
-      "%";
-
-    block.style.top =
-      (50 + Math.random()*40) +
-      "%";
-
-    block.style.background =
-      "#6b4f32";
-
-    block.style.border =
-      "4px solid #3d2e20";
-
-    block.style.boxShadow =
-      "inset 0 10px #79b84b";
-
-    world.appendChild(
-      block
-    );
-
+    const block=document.createElement("div");
+    block.style.position="absolute";
+    block.style.width=(40+Math.random()*70)+"px";
+    block.style.height=(40+Math.random()*70)+"px";
+    block.style.left=Math.random()*95+"%";
+    block.style.top=(50+Math.random()*40)+"%";
+    block.style.background="#6b4f32";
+    block.style.border="4px solid #3d2e20";
+    block.style.boxShadow="inset 0 10px #79b84b";
+    world.appendChild(block);
   }
-
 }
 
-
-/* =========================
-   KEYBOARD
-========================= */
-
-document.addEventListener(
-  "keydown",
-  e => {
-
-    keys[
-      e.key.toLowerCase()
-    ] = true;
-
+document.addEventListener("keydown",e=>{
+  keys[e.key.toLowerCase()]=true;
+  if(e.key==="Escape"){
+    game.style.display="none";
+    menu.style.display="flex";
   }
-);
-
-document.addEventListener(
-  "keyup",
-  e => {
-
-    keys[
-      e.key.toLowerCase()
-    ] = false;
-
-  }
-);
-
-
-/* =========================
-   MOVEMENT
-========================= */
+});
+document.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
 
 function move(){
-
-  const speed = 4;
-
-  if(keys["w"])
-    player.z -= speed;
-
-  if(keys["s"])
-    player.z += speed;
-
-  if(keys["a"])
-    player.x -= speed;
-
-  if(keys["d"])
-    player.x += speed;
-
+  const speed=4;
+  if(keys.w)player.z-=speed;
+  if(keys.s)player.z+=speed;
+  if(keys.a)player.x-=speed;
+  if(keys.d)player.x+=speed;
 }
 
-
-/* =========================
-   SEND POSITION
-========================= */
-
+let lastSend=0;
 async function sendPosition(){
-
-  if(!user || !roomId)
-    return;
-
+  if(!user||!roomId)return;
   try{
-
-    await update(
-      ref(
-        db,
-        "rooms/" +
-        roomId +
-        "/players/" +
-        user.uid
-      ),
-      {
-        x:player.x,
-        z:player.z
-      }
-    );
-
+    await update(ref(db,"rooms/"+roomId+"/players/"+user.uid),{
+      x:player.x,z:player.z
+    });
+  }catch(error){
+    console.error("Positionsfel:",error);
   }
-
-  catch(error){
-
-    console.error(
-      "Position-fel:",
-      error
-    );
-
-  }
-
 }
-
-
-/* =========================
-   OTHER PLAYERS
-========================= */
 
 function listenToPlayers(){
-
-  const roomRef =
-    ref(
-      db,
-      "rooms/" +
-      roomId +
-      "/players"
-    );
-
-  onValue(
-    roomRef,
-    snapshot => {
-
-      const data =
-        snapshot.val() || {};
-
-      const count =
-        Object.keys(data)
-          .length;
-
-      playersText.textContent =
-        "Spelare: " +
-        count;
-
-      for(const id in data){
-
-        if(id === user.uid)
-          continue;
-
-        players[id] =
-          data[id];
-
-      }
-
-    },
-    error => {
-
-      statusText.textContent =
-        "Läsfel: " +
-        error.code;
-
+  const roomRef=ref(db,"rooms/"+roomId+"/players");
+  onValue(roomRef,snapshot=>{
+    const data=snapshot.val()||{};
+    playersText.textContent="Spelare: "+Object.keys(data).length;
+    for(const id in players){
+      if(!data[id])delete players[id];
     }
-  );
-
+    for(const id in data){
+      if(id!==user.uid)players[id]=data[id];
+    }
+  },error=>{
+    statusText.textContent="Läsfel: "+error.code;
+  });
 }
-
-
-/* =========================
-   GAME LOOP
-========================= */
-
-let lastSend = 0;
 
 function loop(time){
-
+  if(game.style.display==="none")return;
   move();
-
-  if(
-    time-lastSend >
-    100
-  ){
-
+  if(time-lastSend>100){
     sendPosition();
-
-    lastSend =
-      time;
-
+    lastSend=time;
   }
-
   render();
-
-  requestAnimationFrame(
-    loop
-  );
-
+  requestAnimationFrame(loop);
 }
-
-
-/* =========================
-   RENDER
-========================= */
 
 function render(){
+  const world=document.getElementById("world");
+  if(!world)return;
 
-  const world =
-    document.getElementById(
-      "world"
-    );
-
-  if(!world)
-    return;
-
-  document
-    .querySelectorAll(
-      ".otherPlayer"
-    )
-    .forEach(
-      el =>
-        el.remove()
-    );
+  world.querySelectorAll(".otherPlayer").forEach(el=>el.remove());
 
   for(const id in players){
-
-    const p =
-      players[id];
-
-    const el =
-      document.createElement(
-        "div"
-      );
-
-    el.className =
-      "otherPlayer";
-
-    el.style.position =
-      "absolute";
-
-    el.style.width =
-      "28px";
-
-    el.style.height =
-      "45px";
-
-    el.style.background =
-      "#d44";
-
-    el.style.border =
-      "4px solid #222";
-
-    const screenX =
-      50 +
-      (p.x-player.x) *
-      0.15;
-
-    const screenY =
-      55 +
-      (p.z-player.z) *
-      0.08;
-
-    el.style.left =
-      screenX + "%";
-
-    el.style.top =
-      screenY + "%";
-
-    world.appendChild(
-      el
-    );
-
+    const p=players[id];
+    const el=document.createElement("div");
+    el.className="otherPlayer";
+    el.style.position="absolute";
+    el.style.width="28px";
+    el.style.height="45px";
+    el.style.background="#d44";
+    el.style.border="4px solid #222";
+    el.style.left=(50+(p.x-player.x)*0.15)+"%";
+    el.style.top=(55+(p.z-player.z)*0.08)+"%";
+    world.appendChild(el);
   }
-
 }
-
-
-/* =========================
-   DISCONNECT
-========================= */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    if(user && roomId){
-
-      set(
-        ref(
-          db,
-          "rooms/" +
-          roomId +
-          "/players/" +
-          user.uid
-        ),
-        null
-      );
-
-    }
-
-  }
-);
-
 </script>
-
 </body>
 </html>
