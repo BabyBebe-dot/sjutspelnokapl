@@ -1,190 +1,491 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOKA.PL - Block Battle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>noka.pl – Block Battle</title>
 
 <style>
+:root{
+ --bg:#eef7e6;
+ --fg:#1c2a14;
+ --card:#ffffff;
+ --line:#1c2a14;
+ --green:#3fae3a;
+ --dirt:#7a5232;
+ --sky:#8fd3ff;
+ --accent:#ffcf33;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#101a0d;color:#fff7d6;font-family:monospace;text-align:center}
-button,select,input{font-family:monospace;font-size:16px;padding:13px 18px;margin:6px;border:3px solid #090909;border-radius:0}
-button{background:#ffcc27;color:#111;font-weight:bold;cursor:pointer;box-shadow:4px 4px #050505}
-button:hover{background:#ffe77b;transform:translateY(-2px)}
-input,select{background:#fff7d6;color:#111;max-width:95%}
-#menu{width:min(100% - 24px,900px);margin:auto;padding-bottom:40px}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:10px;flex-wrap:wrap}
-.logo{font-size:23px;font-weight:bold}
-.logo span{color:#80c343}
-.topbar a{color:#fff7d6;text-decoration:none;margin:7px;font-weight:bold}
-.hero{position:relative;background:#2d5d7b;border:3px solid black;padding:40px 15px 65px;min-height:330px;overflow:hidden}
-.hero h1{font-size:clamp(45px,9vw,75px);color:white;text-shadow:4px 4px black;margin:15px}
-.hero p{font-size:18px;line-height:1.6;font-weight:bold}
-.pixelGround{position:absolute;bottom:0;left:0;right:0;height:30px;background:repeating-linear-gradient(90deg,#704a2d 0 35px,#805638 35px 70px);border-top:3px solid black}
-.grass{position:absolute;bottom:27px;left:0;right:0;height:13px;background:repeating-linear-gradient(90deg,#259b37 0 35px,#38b747 35px 70px)}
-.panel{background:#1d2b18;border:3px solid black;padding:18px;margin:16px auto;max-width:650px}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;text-align:left}
-.card{background:#1d2b18;border:3px solid black;padding:15px;line-height:1.5}
-h2.sectionTitle{text-align:left;font-size:26px;margin-top:38px;text-shadow:3px 3px #987329}
-.modeButton{display:block;width:min(100%,390px);margin:13px auto;padding:17px;font-size:17px}
-.modeButton span{display:block;font-size:12px;font-weight:normal;margin-top:5px}
+html{scroll-behavior:smooth}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--fg);
+ font-family:ui-monospace,Menlo,Consolas,"Courier New",monospace;
+ line-height:1.55;
+}
+button,input,select{
+ font:inherit;
+}
+button{
+ background:var(--accent);
+ color:#1c2a14;
+ border:3px solid var(--line);
+ padding:12px 18px;
+ font-weight:bold;
+ cursor:pointer;
+ box-shadow:4px 4px 0 var(--line);
+}
+button:hover{
+ transform:translate(2px,2px);
+ box-shadow:2px 2px 0 var(--line);
+ background:#ffe47a;
+}
+input,select{
+ background:white;
+ color:#1c2a14;
+ border:3px solid var(--line);
+ padding:12px;
+ max-width:100%;
+}
+.wrap{
+ max-width:980px;
+ margin:auto;
+ padding:0 18px;
+}
+nav{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:14px 0;
+ gap:12px;
+ flex-wrap:wrap;
+}
+nav b{font-size:22px}
+nav a{
+ margin-left:16px;
+ text-decoration:none;
+ font-weight:bold;
+}
+nav a:hover{text-decoration:underline}
+.hero{
+ background:var(--sky);
+ border:4px solid var(--line);
+ margin-top:6px;
+ position:relative;
+ overflow:hidden;
+ text-align:center;
+ padding:40px 18px 85px;
+}
+.hero h1{
+ font-size:clamp(40px,10vw,76px);
+ margin:0;
+ letter-spacing:-2px;
+ text-shadow:4px 4px 0 var(--line);
+ color:white;
+}
+.hero p{
+ font-size:18px;
+ max-width:560px;
+ margin:12px auto 20px;
+ font-weight:bold;
+}
+.ground{
+ position:absolute;
+ left:0;
+ right:0;
+ bottom:0;
+ height:46px;
+ background:repeating-linear-gradient(90deg,var(--green) 0 40px,#379a33 40px 80px);
+ border-top:4px solid var(--line);
+}
+.ground:after{
+ content:"";
+ position:absolute;
+ left:0;
+ right:0;
+ top:16px;
+ bottom:0;
+ background:repeating-linear-gradient(90deg,var(--dirt) 0 40px,#6a4528 40px 80px);
+}
+.guy{
+ position:absolute;
+ bottom:42px;
+ width:30px;
+ height:62px;
+}
+.guy i{
+ position:absolute;
+ display:block;
+ border:2px solid var(--line);
+}
+.guy .h{left:5px;top:0;width:20px;height:20px;background:#f0c090}
+.guy .b{left:3px;top:20px;width:24px;height:24px}
+.guy .l{left:3px;top:44px;width:24px;height:18px;background:#2b3a67}
+.g1{left:10%}.g1 .b{background:#3b78d8}
+.g2{right:12%;transform:scale(1.5);transform-origin:bottom}
+.g2 .b{background:#c01818}
+.g3{left:26%}.g3 .b{background:#f2c21b}
+h2{
+ font-size:28px;
+ margin:42px 0 15px;
+ text-shadow:3px 3px 0 var(--accent);
+}
+.panel{
+ background:var(--card);
+ border:4px solid var(--line);
+ padding:18px;
+ margin:16px 0;
+ box-shadow:5px 5px 0 var(--line);
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:14px;
+}
+.card{
+ background:var(--card);
+ border:4px solid var(--line);
+ padding:15px;
+ box-shadow:5px 5px 0 var(--line);
+}
+.card h3{margin:0 0 6px}
+.modeButton{
+ display:block;
+ width:min(100%,420px);
+ margin:13px auto;
+ padding:15px;
+ font-size:17px;
+}
+.modeButton span{
+ display:block;
+ font-size:12px;
+ font-weight:normal;
+ margin-top:4px;
+}
 #onlineOptions,#botOptions,#bossOptions{display:none}
-#status{color:#b9ed8c;margin:18px;font-weight:bold;overflow-wrap:anywhere}
-.small{font-size:12px;color:#bbb}
-#game{display:none;position:fixed;inset:0;background:#172b18;z-index:5}
-#gameArea{position:absolute;inset:0;overflow:hidden}
-#screen{width:100%;height:100%;display:block;touch-action:none}
-#hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;text-shadow:2px 2px 3px black;font-weight:bold;font-size:15px}
-.hudBox{background:#172b18dd;padding:9px;border:2px solid #ffcc27}
-#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:28px;text-shadow:2px 2px black;pointer-events:none}
-#message{position:absolute;bottom:100px;left:0;right:0;color:white;font-weight:bold;text-shadow:2px 2px black;pointer-events:none}
-#weaponName{position:absolute;bottom:16px;right:18px;color:#ffdc42;font-size:19px;font-weight:bold;text-shadow:2px 2px black}
-#gameButtons{position:absolute;top:75px;right:10px;display:flex;flex-direction:column;align-items:flex-end}
-#gameButtons button{padding:9px;font-size:12px}
-#mobile{display:none;position:absolute;bottom:12px;left:10px;right:10px;justify-content:space-between;align-items:flex-end;pointer-events:auto}
-#mobile button{opacity:.85;padding:14px}
-#mobile .fire{background:#ed4949;color:white}
-#mobile .move{display:grid;grid-template-columns:repeat(3,48px)}
-#mobile .move button{margin:2px;padding:10px}
-@media(hover:none){#mobile{display:flex}}
+#status{
+ margin:18px 0;
+ padding:12px;
+ background:var(--card);
+ border:3px solid var(--line);
+ overflow-wrap:anywhere;
+ font-weight:bold;
+}
+.small{font-size:12px;opacity:.7}
+footer{text-align:center;padding:25px 0;opacity:.7}
+
+#game{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:10;
+ background:#8fd3ff;
+}
+#screen{
+ width:100%;
+ height:100%;
+ display:block;
+ touch-action:none;
+}
+#hud{
+ position:absolute;
+ top:10px;
+ left:10px;
+ right:10px;
+ display:flex;
+ justify-content:space-between;
+ gap:7px;
+ pointer-events:none;
+}
+.hudBox{
+ background:#ffffffed;
+ color:#1c2a14;
+ border:3px solid #1c2a14;
+ padding:7px 10px;
+ font-weight:bold;
+ box-shadow:3px 3px #1c2a14;
+ font-size:14px;
+}
+#crosshair{
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ color:white;
+ font-size:30px;
+ text-shadow:2px 2px black;
+ pointer-events:none;
+}
+#message{
+ position:absolute;
+ bottom:100px;
+ left:10px;
+ right:10px;
+ text-align:center;
+ font-weight:bold;
+ color:white;
+ text-shadow:2px 2px 3px black;
+ pointer-events:none;
+}
+#weaponName{
+ position:absolute;
+ bottom:15px;
+ right:15px;
+ background:#fff;
+ border:3px solid #1c2a14;
+ padding:7px 12px;
+ font-weight:bold;
+}
+#gameButtons{
+ position:absolute;
+ top:70px;
+ right:10px;
+ display:flex;
+ flex-direction:column;
+ align-items:flex-end;
+}
+#gameButtons button{
+ font-size:12px;
+ padding:8px 12px;
+}
+#mobile{
+ display:none;
+ position:absolute;
+ bottom:10px;
+ left:8px;
+ right:8px;
+ justify-content:space-between;
+ align-items:flex-end;
+ pointer-events:auto;
+}
+#mobile button{
+ padding:12px;
+ min-width:44px;
+}
+#mobile .move{
+ display:grid;
+ grid-template-columns:repeat(3,46px);
+}
+#mobile .move button{margin:2px}
+#mobile .fire{
+ background:#ef5555;
+ color:white;
+}
+@media(hover:none){
+ #mobile{display:flex}
+}
 @media(max-width:550px){
- .cards{grid-template-columns:1fr}
- .topbar{justify-content:center}
- .hero{min-height:320px}
+ .wrap{padding:0 12px}
+ nav{justify-content:center}
+ nav a{margin:5px}
+ .hero{padding-top:30px}
  #hud{font-size:11px}
- .hudBox{padding:6px}
+ .hudBox{padding:5px}
+ .cards{grid-template-columns:1fr}
 }
 </style>
 </head>
 
 <body>
-<div id="menu">
- <div class="topbar">
-  <div class="logo"><span>🟩</span> noka.pl</div>
-  <div>
-   <a href="#modes">Spelet</a>
-   <a href="#characters">Gubbar</a>
-   <a href="#controls">Styrning</a>
-  </div>
- </div>
 
- <div class="hero">
-  <h1>noka.pl</h1>
-  <p>BLOCK BATTLE<br>Blockig skjutarkamp i första person.<br>Ett liv. Alla mot alla.</p>
-  <button onclick="document.getElementById('modes').scrollIntoView({behavior:'smooth'})">▶ SPELA NU</button>
-  <div class="grass"></div>
-  <div class="pixelGround"></div>
- </div>
+<div class="wrap" id="menu">
 
- <h2 class="sectionTitle">Vad är det här?</h2>
- <div class="cards">
-  <div class="card"><h3>🧱 Blockvärld</h3>En färgglad värld med block, byggnader och hinder.</div>
-  <div class="card"><h3>❤️ Hälsa</h3>Håll koll på ditt liv under matchen.</div>
-  <div class="card"><h3>🔫 Vapen</h3>Glock och sniper med olika egenskaper.</div>
-  <div class="card"><h3>👹 Bossar</h3>Kämpa mot en stor boss med 350 liv.</div>
-  <div class="card"><h3>🌐 Multiplayer</h3>Skapa ett rum och bjud in dina vänner.</div>
-  <div class="card"><h3>🏆 Poäng</h3>Samla poäng och vinn matcher.</div>
+<nav>
+ <b>🟩 noka.pl</b>
+ <div>
+  <a href="#spel">Spelet</a>
+  <a href="#gubbar">Gubbar</a>
+  <a href="#styrning">Styrning</a>
  </div>
+</nav>
 
- <h2 class="sectionTitle" id="modes">Välj spelläge</h2>
- <div class="panel">
-  <input id="playerName" maxlength="14" placeholder="Ditt namn">
-  <button class="modeButton" onclick="chooseMode('both')">FRIENDS + BOTS<span>Spela med vänner och bots</span></button>
-  <button class="modeButton" onclick="chooseMode('friends')">FRIENDS ONLY<span>Spela online med dina vänner</span></button>
-  <button class="modeButton" onclick="chooseMode('bots')">BOTS ONLY<span>Spela ensam mot datorstyrda spelare</span></button>
-  <button class="modeButton" onclick="chooseMode('boss')">👹 BOSS BATTLE<span>Utmana bossen med 350 liv</span></button>
+<header class="hero">
+ <h1>noka.pl</h1>
+ <p>Blockig skjutarkamp i första person. Ett liv. Alla mot alla. Bara en kan vinna.</p>
+ <button onclick="document.getElementById('spellagen').scrollIntoView({behavior:'smooth'})">
+  ▶ SPELA NU
+ </button>
+ <div class="guy g3"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+ <div class="guy g1"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+ <div class="guy g2"><i class="h"></i><i class="b"></i><i class="l"></i></div>
+ <div class="ground"></div>
+</header>
+
+<h2 id="spel">Vad är det här?</h2>
+
+<div class="grid">
+ <div class="card">
+  <h3>🧱 Allt är kvadrat</h3>
+  <p>En värld av block, byggnader och hinder.</p>
  </div>
-
- <div id="onlineOptions" class="panel">
-  <h2>🌐 MULTIPLAYER</h2>
-  <button onclick="createRoom()">CREATE ROOM</button>
-  <p>ELLER</p>
-  <input id="roomCode" maxlength="6" placeholder="SEXSIFFRIG KOD">
-  <button onclick="joinRoom()">JOIN A FRIEND</button>
+ <div class="card">
+  <h3>💀 Ett liv</h3>
+  <p>Håll koll på ditt liv under matchen.</p>
  </div>
-
- <div id="botOptions" class="panel">
-  <h2>🤖 BOT SETTINGS</h2>
-  <select id="difficulty">
-   <option value="easy">EASY</option>
-   <option value="normal" selected>NORMAL</option>
-   <option value="hard">HARD</option>
-  </select><br>
-  <button onclick="startBots()">START GAME</button>
+ <div class="card">
+  <h3>🔫 Glock och sniper</h3>
+  <p>Två vapen med olika egenskaper.</p>
  </div>
-
- <div id="bossOptions" class="panel">
-  <h2>👹 BOSS BATTLE</h2>
-  <p>Bossens liv: 350</p>
-  <button onclick="startBoss()">FIGHT THE BOSS</button>
+ <div class="card">
+  <h3>👹 Bossar</h3>
+  <p>En stor boss med 350 liv väntar.</p>
  </div>
-
- <h2 class="sectionTitle" id="characters">Gubbar</h2>
- <div class="panel">
-  <p>Välj färg på din spelare:</p>
-  <select id="skin">
-   <option value="#3988ee">BLUE</option>
-   <option value="#e64a4a">RED</option>
-   <option value="#e9c83d">YELLOW</option>
-   <option value="#47bd65">GREEN</option>
-   <option value="#a45be0">PURPLE</option>
-   <option value="#e98b39">ORANGE</option>
-  </select>
+ <div class="card">
+  <h3>🌐 Online med kod</h3>
+  <p>Skapa ett rum och bjud in dina vänner.</p>
  </div>
-
- <h2 class="sectionTitle" id="controls">Styrning</h2>
- <div class="panel">
-  <p>W A S D – Gå</p>
-  <p>Musen – Titta</p>
-  <p>Vänsterklick – Skjut</p>
-  <p>1 – Glock</p>
-  <p>2 – Sniper</p>
-  <p>Håll O eller högerklick – Zooma</p>
-  <p>Mellanslag – Hoppa</p>
-  <p>Esc – Släpp musen</p>
+ <div class="card">
+  <h3>🏆 Poäng</h3>
+  <p>Samla poäng genom att besegra bots och bossar.</p>
  </div>
+</div>
 
- <div id="status">Laddar spelet...</div>
- <p class="small">noka.pl · gjort med block ♥</p>
+<h2 id="spellagen">Välj spelläge</h2>
+
+<div class="panel">
+ <input id="playerName" maxlength="14" placeholder="Ditt namn">
+ <p>Välj din spelare:</p>
+ <select id="skin">
+  <option value="#3988ee">🔵 BLUE</option>
+  <option value="#e64a4a">🔴 RED</option>
+  <option value="#e9c83d">🟡 YELLOW</option>
+  <option value="#47bd65">🟢 GREEN</option>
+  <option value="#a45be0">🟣 PURPLE</option>
+  <option value="#e98b39">🟠 ORANGE</option>
+ </select>
+
+ <button class="modeButton" onclick="chooseMode('both')">
+  🌐 FRIENDS + BOTS
+  <span>Spela med vänner och datorstyrda spelare</span>
+ </button>
+
+ <button class="modeButton" onclick="chooseMode('friends')">
+  👥 FRIENDS ONLY
+  <span>Spela online med dina vänner</span>
+ </button>
+
+ <button class="modeButton" onclick="chooseMode('bots')">
+  🤖 BOTS ONLY
+  <span>Spela ensam mot bots</span>
+ </button>
+
+ <button class="modeButton" onclick="chooseMode('boss')">
+  👹 BOSS BATTLE
+  <span>Besegra bossen med 350 liv</span>
+ </button>
+</div>
+
+<div id="onlineOptions" class="panel">
+ <h2>🌐 MULTIPLAYER</h2>
+ <p>Skapa ett nytt rum eller gå med i en kompis rum.</p>
+ <button onclick="createRoom()">CREATE ROOM</button>
+ <p>ELLER</p>
+ <input id="roomCode" maxlength="6" placeholder="SEXSIFFRIG KOD">
+ <button onclick="joinRoom()">JOIN A FRIEND</button>
+</div>
+
+<div id="botOptions" class="panel">
+ <h2>🤖 BOT SETTINGS</h2>
+ <p>Välj svårighetsgrad:</p>
+ <select id="difficulty">
+  <option value="easy">EASY – 3 bots</option>
+  <option value="normal" selected>NORMAL – 5 bots</option>
+  <option value="hard">HARD – 9 bots</option>
+ </select>
+ <br>
+ <button onclick="startBots()">START GAME</button>
+</div>
+
+<div id="bossOptions" class="panel">
+ <h2>👹 BOSS BATTLE</h2>
+ <p>Bossens liv: 350</p>
+ <button onclick="startBoss()">FIGHT THE BOSS</button>
+</div>
+
+<h2 id="gubbar">Gubbarna</h2>
+<div class="grid">
+ <div class="card"><h3>🔵 Blue</h3><p>Din vanliga spelare.</p></div>
+ <div class="card"><h3>🔴 Red</h3><p>En röd blockspelare.</p></div>
+ <div class="card"><h3>🟡 Yellow</h3><p>En gul blockspelare.</p></div>
+ <div class="card"><h3>🟣 Purple</h3><p>En lila blockspelare.</p></div>
+</div>
+
+<h2 id="styrning">Styrning</h2>
+<div class="panel">
+ <p><b>W A S D</b> – Gå</p>
+ <p><b>Musen</b> – Titta</p>
+ <p><b>Vänsterklick</b> – Skjut</p>
+ <p><b>1</b> – Glock</p>
+ <p><b>2</b> – Sniper</p>
+ <p><b>Håll O eller högerklick</b> – Zooma</p>
+ <p><b>Mellanslag</b> – Hoppa</p>
+ <p><b>Esc eller M</b> – Meny</p>
+</div>
+
+<div id="status">Ansluter till Firebase...</div>
+<p class="small">noka.pl · gjort med block ♥</p>
+<footer>noka.pl – Block Battle</footer>
+
 </div>
 
 <div id="game">
- <div id="gameArea">
-  <canvas id="screen"></canvas>
-  <div id="hud">
-   <div class="hudBox" id="health">❤️ 100</div>
-   <div class="hudBox" id="score">🏆 0</div>
-   <div class="hudBox" id="roomLabel">SOLO</div>
+ <canvas id="screen"></canvas>
+
+ <div id="hud">
+  <div class="hudBox" id="health">❤️ 100</div>
+  <div class="hudBox" id="score">🏆 0</div>
+  <div class="hudBox" id="roomLabel">SOLO</div>
+ </div>
+
+ <div id="crosshair">+</div>
+ <div id="message">Klicka på spelet för att börja</div>
+ <div id="weaponName">GLOCK</div>
+
+ <div id="gameButtons">
+  <button onclick="switchWeapon(1)">1 GLOCK</button>
+  <button onclick="switchWeapon(2)">2 SNIPER</button>
+  <button onclick="leaveGame()">MENY</button>
+ </div>
+
+ <div id="mobile">
+  <div class="move">
+   <span></span>
+   <button ontouchstart="mobileKeys.w=true" ontouchend="mobileKeys.w=false">▲</button>
+   <span></span>
+   <button ontouchstart="mobileKeys.a=true" ontouchend="mobileKeys.a=false">◀</button>
+   <button ontouchstart="mobileKeys.s=true" ontouchend="mobileKeys.s=false">▼</button>
+   <button ontouchstart="mobileKeys.d=true" ontouchend="mobileKeys.d=false">▶</button>
   </div>
-  <div id="crosshair">+</div>
-  <div id="message">Klicka på spelet för att börja</div>
-  <div id="weaponName">GLOCK</div>
-  <div id="gameButtons">
-   <button onclick="switchWeapon(1)">1 GLOCK</button>
-   <button onclick="switchWeapon(2)">2 SNIPER</button>
-   <button onclick="leaveGame()">MENY</button>
-  </div>
-  <div id="mobile">
-   <div class="move">
-    <span></span>
-    <button ontouchstart="mobileKeys.w=true" ontouchend="mobileKeys.w=false">▲</button>
-    <span></span>
-    <button ontouchstart="mobileKeys.a=true" ontouchend="mobileKeys.a=false">◀</button>
-    <button ontouchstart="mobileKeys.s=true" ontouchend="mobileKeys.s=false">▼</button>
-    <button ontouchstart="mobileKeys.d=true" ontouchend="mobileKeys.d=false">▶</button>
-   </div>
-   <button class="fire" onclick="shoot()">FIRE</button>
-  </div>
+  <button class="fire" onclick="shoot()">FIRE</button>
  </div>
 </div>
 
+<script>
+window.addEventListener("error",function(e){
+ const s=document.getElementById("status");
+ if(s)s.textContent="JavaScript-fel: "+e.message;
+});
+</script>
+
 <script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js";
-import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {getDatabase,ref,set,get,onValue,remove,onDisconnect,off} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+(async()=>{
+try{
+const THREE=await import("https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js");
+const [firebaseApp,firebaseAuth,firebaseDB]=await Promise.all([
+ import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"),
+ import("https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js"),
+ import("https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js")
+]);
+
+const {initializeApp}=firebaseApp;
+const {getAuth,signInAnonymously}=firebaseAuth;
+const {getDatabase,ref,set,get,onValue,remove,onDisconnect,off}=firebaseDB;
 
 const statusEl=document.getElementById("status");
+
 const firebaseConfig={
  apiKey:"AIzaSyC8fWAd0PkCfC6h6dZ0CYQnWRv1w0Rhm90",
  authDomain:"randompl.firebaseapp.com",
@@ -196,19 +497,27 @@ const firebaseConfig={
  measurementId:"G-BJQ85GZMGZ"
 };
 
-let app,auth,db,uid=null;
-let room=null,roomListener=null,mode="";
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
+
+let uid=null,room=null,roomListener=null,mode="";
 let running=false,playerName="Player",playerColor="#3988ee";
 let score=0,health=100,players={},remoteModels={};
 let bots=[],boss=null,weapon=1,lastShot=0,lastSync=0;
 let scene,camera,renderer,clock,raycaster,gun;
 let yaw=0,pitch=0,playerY=1.7,jumpSpeed=0;
-let pointerLocked=false,zoom=false,writeBusy=false;
-let animationId=null;
+let pointerLocked=false,writeBusy=false,animationId=null;
+let zoom=false;
+
 const keys={};
 window.mobileKeys={w:false,a:false,s:false,d:false};
 const player={x:0,z:0,angle:0};
 const canvas=document.getElementById("screen");
+
+function setStatus(message){
+ statusEl.textContent=message;
+}
 
 function box(w,h,d,color){
  return new THREE.Mesh(
@@ -218,42 +527,43 @@ function box(w,h,d,color){
 }
 
 try{
- app=initializeApp(firebaseConfig);
- auth=getAuth(app);
- db=getDatabase(app);
  const result=await signInAnonymously(auth);
  uid=result.user.uid;
- statusEl.textContent="Firebase ansluten! Välj ett spelläge.";
+ setStatus("Firebase ansluten! Välj ett spelläge.");
 }catch(error){
- statusEl.textContent="Firebase-fel: "+(error.code||error.message);
- console.error("Firebase:",error);
+ setStatus("Firebase-fel: "+(error.code||error.message));
+ console.error(error);
 }
 
 window.chooseMode=function(m){
  mode=m;
- document.getElementById("onlineOptions").style.display=(m==="friends"||m==="both")?"block":"none";
- document.getElementById("botOptions").style.display=m==="bots"?"block":"none";
- document.getElementById("bossOptions").style.display=m==="boss"?"block":"none";
- statusEl.textContent=m==="bots"?"Välj svårighetsgrad.":m==="boss"?"Bossen väntar på dig!":"Skapa ett rum eller gå med i ett rum.";
- const target=(m==="bots"?"botOptions":m==="boss"?"bossOptions":"onlineOptions");
+ document.getElementById("onlineOptions").style.display=
+  m==="friends"||m==="both"?"block":"none";
+ document.getElementById("botOptions").style.display=
+  m==="bots"?"block":"none";
+ document.getElementById("bossOptions").style.display=
+  m==="boss"?"block":"none";
+
+ const target=m==="bots"?"botOptions":m==="boss"?"bossOptions":"onlineOptions";
  document.getElementById(target).scrollIntoView({behavior:"smooth",block:"center"});
+ setStatus(m==="bots"?"Välj svårighetsgrad.":m==="boss"?"Bossen väntar på dig!":"Skapa ett rum eller gå med i ett rum.");
 };
 
-function readPlayerSettings(){
+function readSettings(){
  playerName=document.getElementById("playerName").value.trim()||"Player";
  playerColor=document.getElementById("skin").value;
 }
 
 window.createRoom=async function(){
- if(!uid)return alert("Firebase är inte anslutet ännu. Kontrollera statusen längst ner.");
- readPlayerSettings();
+ if(!uid)return alert("Vänta tills Firebase har anslutit.");
+ readSettings();
  room=Math.random().toString(36).substring(2,8).toUpperCase();
  await enterRoom();
 };
 
 window.joinRoom=async function(){
- if(!uid)return alert("Firebase är inte anslutet ännu. Kontrollera statusen längst ner.");
- readPlayerSettings();
+ if(!uid)return alert("Vänta tills Firebase har anslutit.");
+ readSettings();
  room=document.getElementById("roomCode").value.trim().toUpperCase();
  if(!/^[A-Z0-9]{6}$/.test(room))return alert("Skriv en rumskod med 6 tecken.");
  try{
@@ -261,7 +571,7 @@ window.joinRoom=async function(){
   if(!snap.exists())return alert("Rummet finns inte. Kontrollera koden.");
   await enterRoom();
  }catch(error){
-  alert("Kunde inte gå med: "+error.message);
+  alert("Fel: "+error.message);
  }
 };
 
@@ -269,7 +579,7 @@ async function enterRoom(){
  try{
   await startGame(mode==="both");
   const playerRef=ref(db,"rooms/"+room+"/players/"+uid);
-  await set(playerRef,makePlayerData());
+  await set(playerRef,playerData());
   await onDisconnect(playerRef).remove();
 
   if(roomListener)off(roomListener);
@@ -280,30 +590,29 @@ async function enterRoom(){
   });
 
   document.getElementById("roomLabel").textContent="ROOM "+room;
-  statusEl.textContent="Rumskod: "+room+" – dela koden med dina vänner!";
-  document.getElementById("message").textContent="Klicka i spelet för att börja";
+  document.getElementById("message").textContent="Rumskod: "+room;
+  setStatus("Rumskod: "+room+" – dela den med dina vänner!");
  }catch(error){
   alert("Kunde inte ansluta: "+error.message);
-  console.error(error);
  }
 }
 
 window.startBots=async function(){
- readPlayerSettings();
+ readSettings();
  room=null;
  await startGame(true,false);
 };
 
 window.startBoss=async function(){
- readPlayerSettings();
+ readSettings();
  room=null;
  await startGame(false,true);
 };
 
 function createWorld(){
  scene=new THREE.Scene();
- scene.background=new THREE.Color(0x75c7ef);
- scene.fog=new THREE.Fog(0x75c7ef,35,85);
+ scene.background=new THREE.Color(0x8fd3ff);
+ scene.fog=new THREE.Fog(0x8fd3ff,35,85);
 
  camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,150);
  camera.position.set(0,1.7,0);
@@ -313,7 +622,6 @@ function createWorld(){
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
  renderer.setSize(innerWidth,innerHeight);
  renderer.shadowMap.enabled=true;
- renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
  scene.add(new THREE.HemisphereLight(0xffffff,0x63814c,2));
  const sun=new THREE.DirectionalLight(0xffffff,2.2);
@@ -334,6 +642,7 @@ function createMap(){
  scene.add(ground);
 
  const colors=[0x4b9e40,0x65bd48,0x8cbd46,0x44a7d5,0xc38b49,0xd65d54];
+
  for(let i=0;i<65;i++){
   const x=Math.floor(Math.random()*36-18);
   const z=Math.floor(Math.random()*36-18);
@@ -402,7 +711,10 @@ function createCharacter(color,big=false){
   eye.position.set(x*s,2.25*s,.32*s);
   group.add(eye);
  }
- group.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+
+ group.traverse(o=>{
+  if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}
+ });
  return group;
 }
 
@@ -424,11 +736,13 @@ function createWeapon(){
 function clearGame(){
  if(animationId)cancelAnimationFrame(animationId);
  animationId=null;
+
+ if(roomListener){off(roomListener);roomListener=null;}
+
  if(renderer){
   renderer.dispose();
   renderer=null;
  }
- if(roomListener){off(roomListener);roomListener=null;}
  if(scene){
   scene.traverse(o=>{
    if(o.geometry)o.geometry.dispose();
@@ -438,17 +752,29 @@ function clearGame(){
    }
   });
  }
- scene=null;camera=null;bots=[];boss=null;
- remoteModels={};players={};gun=null;
+ scene=null;
+ camera=null;
+ bots=[];
+ boss=null;
+ remoteModels={};
+ players={};
+ gun=null;
  pointerLocked=false;
 }
 
 async function startGame(useBots,bossMode=false){
  clearGame();
- score=0;health=100;
- player.x=0;player.z=0;player.angle=0;
- yaw=0;pitch=0;playerY=1.7;jumpSpeed=0;
+ score=0;
+ health=100;
+ player.x=0;
+ player.z=0;
+ player.angle=0;
+ yaw=0;
+ pitch=0;
+ playerY=1.7;
+ jumpSpeed=0;
  running=true;
+
  document.getElementById("menu").style.display="none";
  document.getElementById("game").style.display="block";
  document.getElementById("gameButtons").style.display="flex";
@@ -463,27 +789,36 @@ async function startGame(useBots,bossMode=false){
   }
 
   if(bossMode){
-   boss={model:createCharacter(0x8d3bd1,true),health:350,x:0,z:-12,alive:true};
+   boss={
+    model:createCharacter(0x8d3bd1,true),
+    health:350,
+    x:0,
+    z:-12,
+    alive:true,
+    attackTimer:0
+   };
    boss.model.position.set(0,0,-12);
    scene.add(boss.model);
   }
 
   updateHUD();
-  document.getElementById("message").textContent="Klicka på spelet för att börja";
+  document.getElementById("message").textContent="Klicka i spelet för att börja";
   clock.start();
   animate();
  }catch(error){
   running=false;
-  console.error(error);
   alert("Spelet kunde inte starta: "+error.message);
+  console.error(error);
  }
 }
 
 function spawnBot(difficulty="normal"){
  const colors=[0xe94c4c,0x3d94ee,0xf3ca36,0x9a5bdb,0x37bd77];
  const bot={
-  x:Math.random()*20-10,z:Math.random()*20-10,
-  health:100,alive:true,
+  x:Math.random()*20-10,
+  z:Math.random()*20-10,
+  health:100,
+  alive:true,
   speed:difficulty==="easy"?.018:difficulty==="hard"?.04:.027,
   model:createCharacter(colors[Math.floor(Math.random()*colors.length)]),
   attackTimer:0
@@ -495,6 +830,7 @@ function spawnBot(difficulty="normal"){
 
 function updateRemotePlayers(){
  if(!scene)return;
+
  for(const [id,p] of Object.entries(players)){
   if(id===uid)continue;
   if(!remoteModels[id]){
@@ -505,6 +841,7 @@ function updateRemotePlayers(){
   remoteModels[id].position.set(Number(p.x)||0,0,Number(p.y)||0);
   remoteModels[id].rotation.y=-(Number(p.angle)||0);
  }
+
  for(const id of Object.keys(remoteModels)){
   if(!players[id]){
    scene.remove(remoteModels[id]);
@@ -516,14 +853,19 @@ function updateRemotePlayers(){
 function updateBots(delta){
  for(const bot of bots){
   if(!bot.alive)continue;
-  const dx=player.x-bot.x,dz=player.z-bot.z;
+
+  const dx=player.x-bot.x;
+  const dz=player.z-bot.z;
   const distance=Math.hypot(dx,dz);
+
   if(distance>1.8){
    bot.x+=(dx/distance)*bot.speed*delta*60;
    bot.z+=(dz/distance)*bot.speed*delta*60;
   }
+
   bot.model.position.set(bot.x,0,bot.z);
   bot.model.rotation.y=Math.atan2(dx,dz);
+
   bot.attackTimer-=delta;
   if(distance<2.2&&bot.attackTimer<=0){
    health=Math.max(0,health-5);
@@ -535,15 +877,20 @@ function updateBots(delta){
 
 function updateBoss(delta){
  if(!boss||!boss.alive)return;
- const dx=player.x-boss.x,dz=player.z-boss.z;
+
+ const dx=player.x-boss.x;
+ const dz=player.z-boss.z;
  const distance=Math.hypot(dx,dz);
+
  if(distance>3){
   boss.x+=(dx/distance)*.012*delta*60;
   boss.z+=(dz/distance)*.012*delta*60;
  }
+
  boss.model.position.set(boss.x,0,boss.z);
  boss.model.rotation.y=Math.atan2(dx,dz);
- boss.attackTimer=(boss.attackTimer||0)-delta;
+
+ boss.attackTimer-=delta;
  if(distance<3.5&&boss.attackTimer<=0){
   health=Math.max(0,health-8);
   boss.attackTimer=1;
@@ -554,13 +901,15 @@ function updateBoss(delta){
 function updateMovement(delta){
  const speed=7*delta;
  let forward=0,side=0;
+
  if(keys.w||mobileKeys.w)forward++;
  if(keys.s||mobileKeys.s)forward--;
  if(keys.a||mobileKeys.a)side--;
  if(keys.d||mobileKeys.d)side++;
 
  const length=Math.hypot(forward,side)||1;
- forward/=length;side/=length;
+ forward/=length;
+ side/=length;
 
  player.x+=(-Math.sin(yaw)*forward+Math.cos(yaw)*side)*speed;
  player.z+=(-Math.cos(yaw)*forward-Math.sin(yaw)*side)*speed;
@@ -569,9 +918,13 @@ function updateMovement(delta){
   jumpSpeed=7;
   keys[" "]=false;
  }
+
  jumpSpeed-=18*delta;
  playerY+=jumpSpeed*delta;
- if(playerY<1.7){playerY=1.7;jumpSpeed=0;}
+ if(playerY<1.7){
+  playerY=1.7;
+  jumpSpeed=0;
+ }
 
  if(camera){
   camera.position.set(player.x,playerY,player.z);
@@ -585,10 +938,36 @@ function updateHUD(){
  document.getElementById("score").textContent="🏆 "+score;
 }
 
+function playerData(){
+ return {
+  x:player.x,
+  y:player.z,
+  angle:player.angle,
+  name:playerName,
+  color:playerColor,
+  health:health,
+  score:score
+ };
+}
+
+async function syncPlayer(){
+ if(!room||!uid||writeBusy||!running)return;
+ writeBusy=true;
+ try{
+  await set(ref(db,"rooms/"+room+"/players/"+uid),playerData());
+ }catch(error){
+  console.error("Synkroniseringsfel:",error);
+ }finally{
+  writeBusy=false;
+ }
+}
+
 function animate(){
  if(!running||!renderer||!scene)return;
+
  animationId=requestAnimationFrame(animate);
  const delta=Math.min(clock.getDelta(),.05);
+
  updateMovement(delta);
  updateBots(delta);
  updateBoss(delta);
@@ -597,28 +976,10 @@ function animate(){
   lastSync=Date.now();
   syncPlayer();
  }
+
  renderer.render(scene,camera);
+
  if(health<=0)endGame();
-}
-
-function makePlayerData(){
- return {
-  x:player.x,y:player.z,angle:player.angle,
-  name:playerName,color:playerColor,
-  health:health,score:score
- };
-}
-
-async function syncPlayer(){
- if(!room||!uid||writeBusy||!running)return;
- writeBusy=true;
- try{
-  await set(ref(db,"rooms/"+room+"/players/"+uid),makePlayerData());
- }catch(error){
-  console.error("Synkroniseringsfel:",error);
- }finally{
-  writeBusy=false;
- }
 }
 
 function endGame(){
@@ -629,7 +990,7 @@ function endGame(){
  document.getElementById("gameButtons").style.display="flex";
 }
 
-function findTargetFromObject(object){
+function findTarget(object){
  for(const bot of bots){
   if(bot.alive&&bot.model.getObjectById(object.id))return bot;
  }
@@ -642,18 +1003,24 @@ window.shoot=function(){
  lastShot=Date.now();
 
  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+
  const targets=[];
  for(const bot of bots){
   if(bot.alive)bot.model.traverse(o=>{if(o.isMesh)targets.push(o);});
  }
- if(boss&&boss.alive)boss.model.traverse(o=>{if(o.isMesh)targets.push(o);});
+ if(boss&&boss.alive){
+  boss.model.traverse(o=>{if(o.isMesh)targets.push(o);});
+ }
 
  const hits=raycaster.intersectObjects(targets,false);
+
  if(hits.length){
-  const target=findTargetFromObject(hits[0].object);
+  const target=findTarget(hits[0].object);
+
   if(target===boss){
    boss.health-=weapon===1?15:50;
    document.getElementById("message").textContent="BOSS HP: "+Math.max(0,boss.health);
+
    if(boss.health<=0){
     boss.alive=false;
     scene.remove(boss.model);
@@ -671,12 +1038,16 @@ window.shoot=function(){
    }
   }
  }
+
  document.getElementById("crosshair").textContent="✦";
- setTimeout(()=>{document.getElementById("crosshair").textContent="+";},100);
+ setTimeout(()=>{
+  document.getElementById("crosshair").textContent="+";
+ },100);
 };
 
 window.switchWeapon=function(n){
- weapon=n;zoom=false;
+ weapon=n;
+ zoom=false;
  document.getElementById("weaponName").textContent=n===1?"GLOCK":"SNIPER";
  if(gun)gun.scale.setScalar(n===1?1:1.35);
 };
@@ -692,12 +1063,14 @@ function setZoom(active){
 window.addEventListener("keydown",e=>{
  const key=e.key.toLowerCase();
  keys[key]=true;
+
  if(e.key==="1")switchWeapon(1);
  if(e.key==="2")switchWeapon(2);
  if(key==="g")shoot();
  if(key==="o")setZoom(true);
  if(key==="m"&&running)leaveGame();
 });
+
 window.addEventListener("keyup",e=>{
  const key=e.key.toLowerCase();
  keys[key]=false;
@@ -717,7 +1090,7 @@ document.addEventListener("pointerlockchange",()=>{
  pointerLocked=document.pointerLockElement===canvas;
  if(running){
   document.getElementById("message").textContent=
-   pointerLocked?"":"Klicka på spelet för att börja";
+   pointerLocked?"":"Klicka i spelet för att börja";
  }
 });
 
@@ -729,9 +1102,11 @@ document.addEventListener("mousemove",e=>{
 });
 
 canvas.addEventListener("contextmenu",e=>e.preventDefault());
+
 canvas.addEventListener("mousedown",e=>{
  if(e.button===2&&pointerLocked)setZoom(true);
 });
+
 canvas.addEventListener("mouseup",e=>{
  if(e.button===2){
   setZoom(false);
@@ -757,12 +1132,22 @@ window.leaveGame=async function(){
    console.error(error);
   }
  }
+
  room=null;
  clearGame();
+
  document.getElementById("game").style.display="none";
  document.getElementById("menu").style.display="block";
- statusEl.textContent="Tillbaka i menyn.";
+ setStatus("Tillbaka i menyn.");
 };
+
+}catch(error){
+ console.error(error);
+ const status=document.getElementById("status");
+ if(status)status.textContent="Kunde inte ladda spelet: "+(error.message||error);
+}
+})();
 </script>
+
 </body>
 </html>
